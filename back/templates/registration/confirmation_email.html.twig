@@ -1,0 +1,23 @@
+{% extends "base.html.twig" %}
+{% block title %}Bienvenue chez O'Baby !
+{% endblock %}
+{% block body %}
+	<div class="container">
+		<h1>Bonjour, bienvenue chez O'Baby !</h1>
+		<br>
+		<br>
+		<p>
+			Confirmez votre adresse E-mail en cliquant sur le lien suivant :
+			<br><br>
+			<a style="text-decoration:none; padding:10px 15px; margin : 0px; background-color: #f3A4C4; color: #fff; border-radius:8px; border : 1px solid black;  " href="{{ signedUrl }}">Confirmer mon E-mail</a>
+			<br>
+			<br>
+			Ce lien expire dans
+			{{ expiresAtMessageKey|trans(expiresAtMessageData, 'VerifyEmailBundle') }}.
+		</p>
+
+		<p>
+			À bientôt !
+		</p>
+	</div>
+{% endblock %}

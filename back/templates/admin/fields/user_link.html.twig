@@ -1,0 +1,11 @@
+{% if field.value is empty %}
+    <span class="badge badge-secondary">{{ field.value|length }}</span>
+{% else %}
+{% for user in field.value %}
+    <a href="{{ path('admin', {
+        'crudAction': 'detail',
+        'crudControllerFqcn': 'App\\Controller\\Admin\\UserCrudController',
+        'entityId': user.id,
+    }) }}" class="badge badge-success">{{ user.firstName }}</a>
+{% endfor %}
+{% endif %}

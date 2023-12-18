@@ -1,0 +1,11 @@
+{% if field.value is iterable %}
+    {% if field.value|length > 0 %}
+        {% for message in field.value %}
+            {{ loop.index }}. {{ message.author.firstName }} - {{ message.content }}<br>
+        {% endfor %}
+    {% else %}
+        Aucun message
+    {% endif %}
+{% else %}
+    {{ field.value }}
+{% endif %}

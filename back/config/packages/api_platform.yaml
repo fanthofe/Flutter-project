@@ -1,0 +1,26 @@
+api_platform:
+
+    title: 'O_Baby API'
+    description: 'Expose les donnees de O_Baby en REST API'
+    version: '1.0.0'
+    # hide spider on documentation page
+    show_webby: false
+    mapping:
+        paths: ['%kernel.project_dir%/src/Entity']
+    # formats:
+    #     jsonld: ['application/ld+json'] # For swagger UI
+    #     json: ['application/json']
+    patch_formats:
+       json: ['application/json']
+    swagger:
+        versions: [3]
+        api_keys:
+            apiKey:
+                name: Authorization
+                type: header
+    # collection: 
+    #     pagination:
+    #         enabled: true
+    #         client_items_per_page: true
+    #         items_per_page: 10
+    

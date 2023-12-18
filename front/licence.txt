@@ -1,0 +1,5 @@
+All Rights Reserved
+
+The code and associated files in this repository are proprietary and confidential. No part of this code may be copied, reproduced, modified, or distributed in any form or by any means, whether electronic, mechanical, or otherwise, without the express written permission of the author.
+
+Any unauthorized use, reproduction, or distribution of the code is strictly prohibited and may be subject to legal action.

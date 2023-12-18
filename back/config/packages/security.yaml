@@ -1,0 +1,74 @@
+security:
+
+    enable_authenticator_manager: true
+
+    password_hashers:
+        Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface: 'auto'
+    
+    providers:
+        app_user_provider: # the provider name
+            entity: # use the entity provider to query for user
+                class: App\Entity\User # the entity class used to query for user
+                property: email # the property to query used to autenticate user - e.g. username, email, etc
+    
+    firewalls:
+
+        login: # the login firewall is used to authenticate users from login form
+            pattern: ^/auth # all routes starting with /auth will be handled here
+            stateless: true # no session will be created for these requests
+            json_login: # use json_login to signal that this is a json login request 
+                check_path: /auth # the route that handles the login request 
+                username_path: email # the property to query by - e.g. username, email, etc
+                password_path: password # the property to query by - e.g. username, email, etc
+                success_handler: lexik_jwt_authentication.handler.authentication_success # the handler that will deal with the successful authentication
+                failure_handler: lexik_jwt_authentication.handler.authentication_failure # the handler that will deal with failed authentication
+        
+        api: # the api firewall is used to authenticate users from api requests
+            pattern:   ^/api # all routes starting with /api will be handled here
+            stateless: true # no session will be created for these requests
+            jwt: ~ # use jwt to signal that this is a jwt authentication request
+
+        dev:
+            pattern: ^/(_(profiler|wdt)|css|images|js)/
+            security: false
+        
+        main: # the main firewall is used to authenticate users from web requests (e.g. browser) and add user in session
+            lazy: true # lazy load the user from session to avoid querying the database on every request
+            provider: app_user_provider # the provider that will be used to query for user (see providers section)
+            custom_authenticator: App\Security\UserLoginAuthenticator # the authenticator that will handle the authentication
+            logout: # the logout configuration
+                path: app_logout # the route that handles the logout request
+                invalidate_session: true # invalidate the session on logout to clean up the session
+            login_throttling: # the login throttling configuration
+                max_attempts: 5 # the maximum number of attempts before blocking the user
+                interval: '30 minutes' # the interval to block the user after the maximum number of attempts
+            remember_me:
+                secret: '%kernel.secret%'
+                lifetime: 604800 # 1 week in seconds
+            # https://symfony.com/doc/current/security/impersonating_user.html
+            # switch_user: true
+
+    # Easy way to control access for large sections of your site
+    # Note: Only the *first* access control that matches will be used
+    access_control:
+
+        - { path: ^/admin, roles: ROLE_ADMIN } # allow access to /admin only for users with ROLE_ADMIN role
+        - { path: ^/auth, roles: PUBLIC_ACCESS } # allow access to /auth only for users with PUBLIC_ACCESS role
+        - { path: ^/contact, roles: PUBLIC_ACCESS } # allow access to /contact only for users with PUBLIC_ACCESS role
+        - { path: ^/api/register, roles: PUBLIC_ACCESS } # allow access to /api/register only for users with PUBLIC_ACCESS role
+        - { path: ^/api,       roles: PUBLIC_ACCESS } # allow access to /api only for users with ROLE_USER role (e.g. authenticated users)
+        - { path: ^/verify/email,       roles: PUBLIC_ACCESS } # allow access to /verify/email only for users with PUBLIC_ACCESS role
+        - { path: ^/login,       roles: PUBLIC_ACCESS } # allow access to /login only for users with PUBLIC_ACCESS role
+        - { path: ^/reset-password,       roles: PUBLIC_ACCESS } # allow access to /login only for users with PUBLIC_ACCESS role
+        - { path: ^/,     roles: IS_AUTHENTICATED_FULLY } # allow access to all routes only for users with IS_AUTHENTICATED_FULLY role
+
+
+
+when@test:
+    security:
+        password_hashers:
+            Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface:
+                algorithm: auto
+                cost: 4 # Lowest possible value for bcrypt
+                time_cost: 3 # Lowest possible value for argon
+                memory_cost: 10 # Lowest possible value for argon
