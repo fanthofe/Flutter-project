@@ -39,6 +39,49 @@ class ChatMessageRepository extends ServiceEntityRepository
         }
     }
 
+    /**
+     * Count all messages
+     * @return int
+     */
+    public function countAllMessages() : int
+    {
+        return $this->createQueryBuilder('cm')
+            ->select('count(cm.id)')
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
+
+    /**
+     * Count all messages from parents
+     * @return int
+     */
+    public function countAllMessagesParent(): int
+    {
+        return $this->createQueryBuilder('cm')
+            ->select('count(cm.id)')
+            ->leftJoin('cm.author', 'u')
+            ->where('u.parent = :isParent')
+            ->setParameter('isParent', 1)
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
+
+    /**
+     * Count all messages from gardians
+     * @return int
+     */
+    public function countAllMessagesGardian(): int
+    {
+        return $this->createQueryBuilder('cm')
+            ->select('count(cm.id)')
+            ->leftJoin('cm.author', 'u')
+            ->where('u.parent = :isParent')
+            ->setParameter('isParent', 0)
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
+    
+
 //    /**
 //     * @return ChatMessage[] Returns an array of ChatMessage objects
 //     */

@@ -2,10 +2,14 @@
 
 namespace App\Controller\Api;
 
+use App\Message\ChatMessage;
 use App\Repository\ChatRepository;
 use App\Repository\UserRepository;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\Messenger\MessageBusInterface;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 class ApiChatController extends AbstractController
 {
@@ -35,7 +39,25 @@ class ApiChatController extends AbstractController
         // get chat id if exists
         $chat = $chat ? $chat->getId() : null;
         // return a json response with the chat
-        return $this->json($chat, 200, []);
+        return $this->json($chat, 201, []);
+    }
+
+    /**
+     * Create a new chat message for a chat and dispatch it to the message bus 
+     * and to mercure using doctrine event subscriber
+     * 
+     * @Route("/api/async_chat_messages", name="api_post_async_messages", methods={"POST"})
+     */
+    public function newMessage(
+        Request $request, 
+        MessageBusInterface $bus
+        )
+    {
+        $data = json_decode($request->getContent(), true);
+        $chatMessage = new ChatMessage($data['author'], $data['content'], $data['chat']);
+        $bus->dispatch($chatMessage);
+
+        return $this->json('message reçu', 200, []);
     }
 
 }

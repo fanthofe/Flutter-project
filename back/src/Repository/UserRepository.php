@@ -56,6 +56,90 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
         $this->add($user, true);
     }
 
+    /**
+     * Get all cities name from users
+     * @return array
+     */
+    public function getAllCities(): array
+    {
+        return $this->createQueryBuilder('u')
+            ->select('u.city')
+            ->distinct()
+            ->where('u.city IS NOT NULL')
+            ->getQuery()
+            ->getResult();
+    }
+
+    /**
+     * Count users by city
+     * @return array
+     */
+    public function countUsersByCity(): array
+    {
+        $cities = $this->getAllCities();
+        $citiesCount = [];
+
+        foreach ($cities as $city) {
+            $citiesCount[$city['city']] = $this->createQueryBuilder('u')
+                ->select('count(u.id)')
+                ->where('u.city = :city')
+                ->setParameter('city', $city['city'])
+                ->getQuery()
+                ->getSingleScalarResult();
+        }
+
+        return $citiesCount;
+    }
+
+    /**
+     * Count suspended users
+    */
+    public function countSuspendedUsers(): int
+    {
+        return $this->createQueryBuilder('u')
+            ->select('count(u.id)')
+            ->where('u.status = 0')
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
+
+    /**
+     * Get all cities zip from users
+     * @return array
+     */
+    public function getAllCitiesZip(): array
+    {
+        return $this->createQueryBuilder('u')
+            ->select('u.zip')
+            ->distinct()
+            ->where('u.zip IS NOT NULL')
+            ->getQuery()
+            ->getResult();
+    }
+
+    /**
+     * Count all users
+     */
+    public function countAllUsers(): int
+    {
+        return $this->createQueryBuilder('u')
+            ->select('count(u.id)')
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
+
+    /**
+     * Count all parents
+     */
+    public function countAllParents(): int
+    {
+        return $this->createQueryBuilder('u')
+            ->select('count(u.id)')
+            ->where('u.parent = 1')
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
+
 
 
 //    /**

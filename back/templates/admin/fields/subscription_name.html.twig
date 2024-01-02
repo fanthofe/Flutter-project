@@ -1,0 +1,7 @@
+{# link to Subscription detail #}
+<a href="{{ path('admin', {
+    'crudAction': 'detail',
+    'crudControllerFqcn': 'App\\Controller\\Admin\\SubscriptionCrudController',
+    'entityId': field.value.id,
+}) }}" class="badge badge-success">{{ field.value.name }}</a>
+

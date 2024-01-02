@@ -34,13 +34,6 @@ services:
         tags:
             - { name: kernel.event_listener, event: lexik_jwt_authentication.on_authentication_success, method: onLoginSuccess }
     
-    # On chat message flush event, we send a message to mercure hub
-    App\EventSubscriber\ChatMessageEventSubscriber:
-        arguments:
-            $container: '@service_container'
-        tags:
-            - { name: doctrine.event_subscriber, connection: default }
-    
     # Custom voter for chat message only Athor and admin can patch or delete his message
     App\Security\Voters\ChatMessageVoter:
         tags:
@@ -50,3 +43,31 @@ services:
     App\Security\Voters\UserProfileVoter:
         tags:
             - { name: 'userprofile.voter' }
+
+    # Get all users city from database.
+    App\Service\GetUsersCityService:
+        arguments:
+            $entityManager: '@doctrine.orm.entity_manager'
+        tags:
+            - { name: 'city.service' }
+    
+    # Get all subscription name from database.
+    App\Service\GetSubscriptionService:
+        arguments:
+            $entityManager: '@doctrine.orm.entity_manager'
+        tags:
+            - { name: 'subscription.service' }
+    
+    # Statistic service for get all statistic data.
+    App\Service\StatsService:
+        arguments:
+            $entityManager: '@doctrine.orm.entity_manager'
+        tags:
+            - { name: 'stats.service' }
+
+    # After new chat message flush event, we publish a notification to mercure hub
+    App\EventSubscriber\DoctrineChatMessageSubscriber:
+        arguments:
+            $container: '@service_container'
+        tags:
+            - { name: doctrine.event_subscriber, connection: default }

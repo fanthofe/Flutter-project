@@ -39,6 +39,20 @@ class SubscriptionRepository extends ServiceEntityRepository
         }
     }
 
+    /**
+     * Get all subscriptions names
+     * @return array
+     */
+    public function getAllSubscriptionsNames(): array
+    {
+        return $this->createQueryBuilder('s')
+            ->select('s.name')
+            ->distinct()
+            ->where('s.name IS NOT NULL')
+            ->getQuery()
+            ->getResult();
+    }
+
 //    /**
 //     * @return Subscription[] Returns an array of Subscription objects
 //     */

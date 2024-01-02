@@ -26,18 +26,14 @@ class UserProfileVoter extends Voter
         if (!$user instanceof User) {
             return false;
         }
-
         if ($attribute === 'EDIT') {
-            // On request, if $user->getId() === $subject->getId() return true else return false
             if($user->getId() === $subject->getId()) {
                 return true;
             }
             if ($user->getRoles()[0] === 'ROLE_ADMIN') {
-                // allow admins to edit any user profil
                 return true;
             }
         }
-
         return false;
     }
 

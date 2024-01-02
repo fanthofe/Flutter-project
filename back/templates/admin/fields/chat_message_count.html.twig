@@ -1,0 +1,9 @@
+{% if field.value is iterable %}
+    {{ field.value|length }} {% if field.value|length > 1 %} 
+    messages 
+    {% else %} 
+        message 
+    {% endif %}
+{% else %}
+    {{ field.value }}
+{% endif %}

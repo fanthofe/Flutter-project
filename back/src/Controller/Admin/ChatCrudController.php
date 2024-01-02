@@ -65,19 +65,26 @@ class ChatCrudController extends AbstractCrudController
     {
         return [
             IdField::new('id')
+                ->setTemplatePath('admin/fields/id_link.html.twig')
+                ->hideOnDetail()
                 ->hideOnForm(),
+            IdField::new('id', 'Identifiant')
+                ->hideOnIndex(),
             ChoiceField::new('status', 'Statut')
                 ->setChoices([
                     'Actif' => 1,
                     'Inactif' => 0,
                 ]),
+            AssociationField::new('chatMessages', 'Messages')
+                ->setTemplatePath('admin/fields/chat_message_count.html.twig')
+                ->hideOnForm(),  
             AssociationField::new('user', 'Participants')
                 ->setFormTypeOption('choice_label', 'firstName')
                 ->setFormTypeOption('multiple', true)
                 ->setFormTypeOption('by_reference', false)
-                // limit chat for 2 users
-                ->setFormTypeOption('attr', ['data-limit' => 2])
+                ->setFormTypeOption('attr', ['data-limit' => 2]) // limit to 2 users
                 ->setTemplatePath('admin/fields/user_link.html.twig'),
+            
             AssociationField::new('chatMessages', 'Messages')
                 ->setTemplatePath('admin/fields/chat_message_content.html.twig')
                 ->hideOnIndex() 
@@ -97,14 +104,14 @@ class ChatCrudController extends AbstractCrudController
     // lien vers le detail d'une fiche
     public function configureActions(Actions $actions): Actions
     {   
-        $isSuperAdmin = $this->security->isGranted('ROLE_ADMIN');
+        $isSuperAdmin = $this->security->isGranted('ROLE_SUPER_ADMIN');
         $isAdmin = $this->security->isGranted('ROLE_ADMIN');
 
         if($isSuperAdmin || $isAdmin) {
             $actions
                 ->setPermission(Action::NEW, 'ROLE_ADMIN')
-                ->setPermission(Action::EDIT, 'ROLE_ADMIN')
-                ->setPermission(Action::DELETE, 'ROLE_ADMIN')
+                ->setPermission(Action::EDIT, 'ROLE_SUPER_ADMIN')
+                ->setPermission(Action::DELETE, 'ROLE_SUPER_ADMIN')
                 ->setPermission(Action::DETAIL, 'ROLE_ADMIN');
         } else {
             $actions

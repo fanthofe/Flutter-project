@@ -97,6 +97,18 @@
             "config/packages/nelmio_cors.yaml"
         ]
     },
+    "nelmio/security-bundle": {
+        "version": "3.1",
+        "recipe": {
+            "repo": "github.com/symfony/recipes",
+            "branch": "main",
+            "version": "2.4",
+            "ref": "65726efb67ff51d89de38195bc0d230fa811f64d"
+        },
+        "files": [
+            "config/packages/nelmio_security.yaml"
+        ]
+    },
     "phpunit/phpunit": {
         "version": "9.6",
         "recipe": {
@@ -109,6 +121,19 @@
             ".env.test",
             "phpunit.xml.dist",
             "tests/bootstrap.php"
+        ]
+    },
+    "scheb/2fa-bundle": {
+        "version": "5.13",
+        "recipe": {
+            "repo": "github.com/symfony/recipes",
+            "branch": "main",
+            "version": "5.0",
+            "ref": "0a83961ef50ff91812b229a6f0caf28431d94aec"
+        },
+        "files": [
+            "config/packages/scheb_2fa.yaml",
+            "config/routes/scheb_2fa.yaml"
         ]
     },
     "sensio/framework-extra-bundle": {

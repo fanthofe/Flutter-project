@@ -1,0 +1,99 @@
+.usersdatas {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    margin-bottom: 40px;
+}
+
+.graph_card {
+    display: flex;
+    flex-direction: column;
+    padding: 10px;
+    width: calc(25% - 20px);
+}
+.graph_card_full {
+    width: calc(100% - 20px);
+}
+.graph_card h2 {
+    margin-bottom: 8px;
+    font-size: 12px;
+}
+
+.graph_card span {
+    font-size: 12px;
+    background-color: #f6f6f6;
+    padding: 5px 10px;
+    margin-bottom: 8px;
+}
+
+.graphs {
+    padding: 40px;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    border: 1px solid #fcfcfc;
+    border-radius: 5px;
+    align-items: center;
+    gap: 40px;
+}
+.graph {
+    margin-bottom: 40px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#notif_span {
+    transition: all .2s ease;
+    border: 1px solid transparent;
+
+}
+
+.graph_card_full {
+    opacity: 0;
+    height: 0;
+    width: 0;
+    transition: opacity 1s ease, height 1s ease;
+}
+
+.graph_card_full.show {
+    opacity: 1;
+    height: auto;
+    width: auto;
+    border: 1px solid;
+    border-radius: 5px;
+    padding: 30px;
+    margin: 30px auto;
+}
+
+.close_btn {
+    width: fit-content;
+    background: bottom;
+    border: none;
+    background: #7EC8F4;
+    color: white;
+    padding: 5px 10px;
+    border-radius: 3px;
+    transition: all .2s ease;
+    margin-top: 20px;
+}
+.close_btn:hover {
+    background: #5ea8e0;
+}
+
+@media only screen and (max-width: 768px) {
+    .usersdatas {
+        justify-content: center;
+    }
+    .graph_card {
+        width: calc(100% - 40px)!important;
+    }
+    .graphs {
+        padding: 20px;
+        flex-direction: column;
+    }
+    .graph {
+        width: calc(100% - 40px)!important;
+    }
+}

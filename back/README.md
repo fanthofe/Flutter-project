@@ -71,13 +71,13 @@ uncomment the line admin mail parameter in `/config/services.yaml` to use the fa
 admin_email: '%env(ADMIN_EMAIL)%'
 ```
 
-create database
+create database if not exists
 
 ```bash
 bin/console d:d:c
 ```
 
-create tables
+create tables shema
 
 ```bash
 bin/console d:m:m
@@ -89,10 +89,22 @@ load fixtures
 bin/console d:f:l
 ```
 
+install assets
+
+```bash
+composer require symfony/asset
+```
+
 launch the local server
 
 ```bash
 symfony serve
+```
+
+consume async messages using the messenger component (used on /contact)
+
+```bash
+bin/console messenger:consume async -vv
 ```
 
 go to https://127.0.0.1:8000/api to see the api documentation

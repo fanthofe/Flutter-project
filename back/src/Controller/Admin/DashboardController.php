@@ -9,6 +9,7 @@ use App\Entity\Chat;
 use App\Entity\ChatMessage; 
 
 use App\Controller\Admin\UserCrudController;
+use App\Controller\Admin\StatisticsController;
 use App\Entity\Comment;
 use App\Entity\Order;
 use App\Entity\Subscription;
@@ -26,23 +27,24 @@ class DashboardController extends AbstractDashboardController
      */
     public function index(): Response
     {
-        // $adminUrlGenerator = $this->container->get(AdminUrlGenerator::class);
         $routeBuilder = $this->container->get(AdminUrlGenerator::class);
         $url = $routeBuilder->setController(UserCrudController::class)->generateUrl();
         return $this->redirect($url);
-        //return $this->render('admin/index.html.twig');
     }
 
     public function configureDashboard(): Dashboard
     {
         return Dashboard::new()
             ->setTitle('Projet 05 Obaby Back')
-            ->disableUrlSignatures();
+            ->disableUrlSignatures()
+            ->renderContentMaximized();
     }
 
     public function configureMenuItems(): iterable
-    {
-        yield MenuItem::linkToDashboard('Dashboard', 'fa fa-home');
+    {   
+        // yield MenuItem::linkToDashboard('Dashboard', 'fa fa-home');
+        yield MenuItem::section('Stats');
+        yield MenuItem::linkToRoute('Statistiques', 'fas fa-chart-bar', 'admin_statistics');
         yield MenuItem::section('Gestion des utilisateurs');
         yield MenuItem::linkToCrud('Utilisateurs', 'fas fa-list', User::class);
         yield MenuItem::linkToCrud('Enfants', 'fas fa-list', Children::class);

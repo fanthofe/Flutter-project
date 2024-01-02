@@ -1,0 +1,21 @@
+@startuml sequence de login d'un utilisateur au backoffice
+actor User
+participant "Formulaire de Login" as LoginForm
+participant "Security Component" as SecurityComponent
+participant "UserLoginAuthenticator" as Authenticator
+participant "UserProvider" as UserProvider
+database "Database" as DataBase
+
+User -> LoginForm: Soumettre Formulaire
+LoginForm -> SecurityComponent: Processus d'authentification
+SecurityComponent --> Authenticator: Intercepte la requête avec le pare-feu "login"
+Authenticator -> UserProvider: Récupération des informations utilisateur
+UserProvider -> DataBase: Recherche de l'utilisateur en base de données
+DataBase --> UserProvider: Retourne les informations de l'utilisateur
+UserProvider --> Authenticator: Retourne les informations de l'utilisateur
+Authenticator -> SecurityComponent: Crée le Token d'authentification
+SecurityComponent -> SecurityComponent: Gère l'authentification avec le pare-feu "login"
+SecurityComponent --> User: Crée une session utilisateur
+SecurityComponent --> LoginForm: Authentification réussie
+LoginForm -> User: Redirection vers la page d'accueil du back-office
+@enduml

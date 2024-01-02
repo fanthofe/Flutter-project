@@ -1,3 +1,7 @@
 auth:
     path: /auth
     methods: ['POST']
+nelmio_security:
+    path:     /nelmio/csp/report
+    defaults: { _controller: nelmio_security.csp_reporter_controller::indexAction }
+    methods:  [POST]

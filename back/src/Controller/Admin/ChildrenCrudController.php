@@ -63,6 +63,11 @@ class ChildrenCrudController extends AbstractCrudController
     {
         return [
             IdField::new('id')
+            ->setTemplatePath('admin/fields/id_link.html.twig')
+            ->hideOnDetail()
+            ->hideOnForm(),
+            IdField::new('id', 'Identifiant')
+                ->hideOnIndex()
                 ->hideOnForm(),
             DateField::new('birthday', 'Date de naissance'),
             TextField::new('gender', 'Genre')
@@ -87,14 +92,14 @@ class ChildrenCrudController extends AbstractCrudController
     // lien vers le detail d'une fiche
     public function configureActions(Actions $actions): Actions
     {   
-        $isSuperAdmin = $this->security->isGranted('ROLE_ADMIN');
+        $isSuperAdmin = $this->security->isGranted('ROLE_SUPER_ADMIN');
         $isAdmin = $this->security->isGranted('ROLE_ADMIN');
 
         if($isSuperAdmin || $isAdmin) {
             $actions
                 ->setPermission(Action::NEW, 'ROLE_ADMIN')
-                ->setPermission(Action::EDIT, 'ROLE_ADMIN')
-                ->setPermission(Action::DELETE, 'ROLE_ADMIN')
+                ->setPermission(Action::EDIT, 'ROLE_SUPER_ADMIN')
+                ->setPermission(Action::DELETE, 'ROLE_SUPER_ADMIN')
                 ->setPermission(Action::DETAIL, 'ROLE_ADMIN');
         } else {
             $actions

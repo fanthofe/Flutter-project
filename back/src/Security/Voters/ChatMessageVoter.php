@@ -22,15 +22,11 @@ class ChatMessageVoter extends Voter
      */
     protected function voteOnAttribute($attribute, $subject, TokenInterface $token)
     {   
-
         $user = $this->getUserFromToken($token);
-      
         if (!$user instanceof User) {
             return false;
         }
-
-        if ($attribute === 'EDIT' || $attribute === 'DELETE') {
-            
+        if ($attribute === 'EDIT' || $attribute === 'DELETE') {  
             // On request, if $user->getId() === $subject->getAuthor() return true else return false
             if($user->getId() === $subject->getAuthor()->getId()) {
                 return true;
@@ -39,9 +35,7 @@ class ChatMessageVoter extends Voter
                 // allow admins to edit or delete any chat message
                 return true;
             }
-
         }
-
         return false;
     }
 

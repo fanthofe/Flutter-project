@@ -12,9 +12,10 @@
     {% endif %}
 
     {% if app.user %}
-      <div class="user_info">
-        Vous êtes connecté en tant que : {{ app.user.userIdentifier }} -
-        <a href="{{ path('app_logout') }}">Déconnexion</a>
+      <div class="user_info ">
+        Vous êtes connecté en tant que : {{ app.user.userIdentifier }}
+        <button class="form_button"><a href="{{ path('app_logout') }}">Déconnexion</a></button>
+        <button class="form_button"><a href="{{ path('admin') }}">Admin</a></button>
       </div>
     {% else %}
 

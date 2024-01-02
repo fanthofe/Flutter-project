@@ -3,43 +3,49 @@
 namespace App\EventSubscriber;
 
 use App\Entity\ChatMessage;
-use App\Entity\Chat;
 use Doctrine\ORM\Events;
 use Doctrine\Common\EventSubscriber;
 use Doctrine\Persistence\Event\LifecycleEventArgs;
-use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 use Symfony\Component\Mercure\Update;
+use Symfony\Component\Mercure\HubInterface;
 use Symfony\Component\Mercure\PublisherInterface;
 
-class ChatMessageEventSubscriber implements EventSubscriber
-{
-    private $publisher;
-    private $container;
-    private $serializer;
+class DoctrineChatMessageSubscriber implements EventSubscriber
+{   
 
     public function __construct(
         PublisherInterface $publisher, 
         ContainerInterface $container, 
-        SerializerInterface $serializer
+        SerializerInterface $serializer,
+        HubInterface $hub
         )
     {
         $this->publisher = $publisher;
         $this->container = $container;
         $this->serializer = $serializer;
+        $this->hub = $hub;
     }
 
-    public function getSubscribedEvents()
+    /**
+     * Get the subscribed events
+     * @return array
+     */
+    public function getSubscribedEvents() : array
     {
         return [
             Events::postPersist, 
         ];
     }
 
+    /**
+     * Get Entity on post persist event
+     * @param LifecycleEventArgs $args
+     * @return void
+     */
     public function postPersist(LifecycleEventArgs $args)
     {
         $entity = $args->getObject();
@@ -48,22 +54,23 @@ class ChatMessageEventSubscriber implements EventSubscriber
         }
     }
 
+    /**
+     * Publish a message update to mercure hub
+     * @param ChatMessage $chatMessage
+     * @return void
+     */
     private function publishMessageUpdate(ChatMessage $chatMessage)
     {   
-        $chatId = $chatMessage->getChat()->getId();
-
-        // update the chat updatedAt on each new message to sort the chat list by last message
-        $chatMessage->getChat()->setUpdatedAt(new \DateTime());
-        $this->container->get('doctrine')->getManager()->flush();
 
         $mercureHubUrl = $this->container->getParameter('mercure_hub_url');
         $messageContent = $this->serializer->serialize($chatMessage, 'json', ['groups' => 'chat_message:read']);
 
         $update = new Update(
-            'chats/' . $chatId, 
+            'chats_messages', 
             $messageContent 
         );
 
-        $this->publisher->__invoke($update, $mercureHubUrl);
+       $this->hub->publish($update); 
+
     }
 }

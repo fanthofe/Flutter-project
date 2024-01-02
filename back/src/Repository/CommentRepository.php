@@ -39,6 +39,48 @@ class CommentRepository extends ServiceEntityRepository
         }
     }
 
+    /**
+     * Count all comments
+     * @return int
+     */
+    public function countAllComments() : int
+    {
+        return $this->createQueryBuilder('c')
+            ->select('count(c.id)')
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
+
+    /**
+     * Count all comments on parents
+     * @return int
+     */
+    public function countAllCommentsOnParents(): int
+    {
+        return $this->createQueryBuilder('c')
+            ->select('count(c.id)')
+            ->leftJoin('c.author', 'u')
+            ->where('u.parent = :isParent')
+            ->setParameter('isParent', 1)
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
+
+    /**
+     * Count all comments on guardians
+     * @return int
+     */
+    public function countAllCommentsOnGuardians(): int
+    {
+        return $this->createQueryBuilder('c')
+            ->select('count(c.id)')
+            ->leftJoin('c.author', 'u')
+            ->where('u.parent = :isParent')
+            ->setParameter('isParent', 0)
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
+
 //    /**
 //     * @return Comment[] Returns an array of Comment objects
 //     */

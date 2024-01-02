@@ -1,0 +1,40 @@
+@startuml 
+actor User
+participant FlutterApp as "Application Flutter"
+participant SymfonyBackend as "Back Office Symfony"
+database Database as "Base de données"
+
+User -> FlutterApp: Remplir formulaire
+activate FlutterApp
+
+FlutterApp -> FlutterApp: Valider formulaire (côté client)
+alt Données invalides
+    FlutterApp --> User: Afficher erreurs de validation
+end
+
+FlutterApp -> SymfonyBackend: Requête HTTP / POST Request Body: données JSON / Request Header: Bearer Token
+activate SymfonyBackend
+
+SymfonyBackend -> SymfonyBackend: Authentification JWT (vérification token)
+alt Token valide
+    SymfonyBackend -> SymfonyBackend: Accès Control (vérification droits d'accès)
+    alt Droits Valides
+        SymfonyBackend -> SymfonyBackend: Valider données (vérification côté serveur)
+        alt Données Valides
+            SymfonyBackend -> Database: Enregistrer les données en base de données
+            Database -> SymfonyBackend : Réponse 
+            SymfonyBackend --> FlutterApp: Réponse HTTP JSON
+        else
+            SymfonyBackend --> FlutterApp: Erreur de validation des données
+        end
+    else
+        SymfonyBackend --> FlutterApp: Accès interdit
+    end
+else
+    SymfonyBackend --> FlutterApp: Erreur d'authentification
+end
+
+deactivate SymfonyBackend
+deactivate FlutterApp
+
+@enduml

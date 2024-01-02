@@ -1,0 +1,22 @@
+@startuml login api
+actor User
+participant "Frontend (LoginForm)" as FrontEnd
+participant "Backend (Security)" as Backend
+participant "UserProvider" as UserProvider
+database "Base de données" as Database
+participant "JWT Listener" as Listener
+
+User -> FrontEnd: Utilisateur
+FrontEnd -> Backend: Requête POST /api/login\navec les informations d'identification
+Backend -> UserProvider: Récupération de l'utilisateur par le UserProvider
+UserProvider -> Database: Recherche de l'utilisateur en base de données
+Database --> UserProvider: Retourne les informations de l'utilisateur
+Backend -> Backend: Authentification de l'utilisateur (via le pare-feu "api")
+Backend -> Backend: Génération du token JWT
+Backend -> Listener: Événement onLoginSuccess de JWT
+Listener -> Listener: Récupération et ajout des informations complémentaires
+Backend <---> Listener: Retourne et reçoit des informations complémentaires
+Backend --> FrontEnd: Retourne le token JWT et des informations supplémentaires
+FrontEnd -> User: Utilisateur connecté\navec le token JWT et informations supplémentaires
+@enduml
+

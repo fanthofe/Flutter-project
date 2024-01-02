@@ -19,6 +19,8 @@ use Doctrine\ORM\Mapping as ORM;
  * @ApiResource(
  * 
  *     paginationEnabled=false,
+ *     
+ *     mercure=true,
  * 
  *     formats={"json"},
  * 

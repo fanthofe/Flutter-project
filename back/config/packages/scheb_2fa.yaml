@@ -1,0 +1,30 @@
+# config/packages/scheb_2fa.yaml
+# See the configuration reference at https://github.com/scheb/2fa/blob/master/doc/configuration.md
+scheb_two_factor:
+    security_tokens:
+        # - Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken
+        # If you're using guard-based authentication, you have to use this one:
+        #- Symfony\Component\Security\Guard\Token\PostAuthenticationGuardToken
+        # If you're using authenticator-based security (introduced in Symfony 5.1), you have to use this one:
+        - Symfony\Component\Security\Http\Authenticator\Token\PostAuthenticationToken
+    email:
+        digits: 6
+        enabled: true
+        sender_email: no-reply@obaby.simschab.cloud
+        sender_name: Obaby - Application
+        # custom form template 
+        template: security/2fa_form.html.twig
+        #form_template: 'scheb_two_factor/email_form.html.twig'
+    
+    # device de confiance pour ne pas avoir à demander le code à chaque fois si on se connecte depuis le même navigateur
+    trusted_device:
+        enabled: true                 # If the trusted device feature should be enabled
+        lifetime: 5184000              # Lifetime of the trusted device token
+        extend_lifetime: false         # Automatically extend lifetime of the trusted cookie on re-login
+        cookie_name: trusted_device    # Name of the trusted device cookie
+        cookie_secure: true           # Set the 'Secure' (HTTPS Only) flag on the trusted device cookie
+        cookie_same_site: "lax"        # The same-site option of the cookie, can be "lax" or "strict"
+        cookie_domain: ".obaby.simschab.cloud"  # Domain to use when setting the cookie, fallback to the request domain if not set
+        cookie_path: "/"               # Path to use when setting the cookie
+        
+    

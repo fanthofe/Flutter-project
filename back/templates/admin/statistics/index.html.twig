@@ -1,0 +1,375 @@
+
+{% extends '@EasyAdmin/layout.html.twig' %}
+
+{% block content %}
+{% block stylesheets %}<link rel="stylesheet" href="{{ asset('assets/styles/stats.css') }}">{% endblock %}
+
+<main class="statscontainer">
+    <h1>Statistiques</h1>
+
+    <div class="graph_card graph_card_full">
+        <h2></h2>
+        <span class="from"></span>
+        <span class="subject"></span>
+        <span class="message"></span>
+        <button class="close_btn">Fermer</button>
+    </div>
+
+<section class="usersdatas">
+    <div class="graph_card">
+        <h2>Contact E-mail</h2>
+        <span id="mail_span">0</span>
+    </div>
+
+        <div class="graph_card">
+            <h2>Nombre d'utilisateurs</h2>
+            <span>{{usersCount}}</span>
+        </div>
+
+        <div class="graph_card">
+            <h2>Nombre de parents</h2>
+            <span>{{ parentsCount }}</span>
+        </div>
+
+        <div class="graph_card">
+            <h2>Nombre de gardiens</h2>
+            <span>{{ gardiensCount }}</span>
+        </div>
+
+        <div class="graph_card">
+            <h2>Nombre d'enfants</h2>
+            <span>{{ childrenCount }}</span>
+        </div>
+
+        <div class="graph_card">
+            <h2>Nombre de filles</h2>
+            <span>{{ girlsCount }}</span>
+        </div>
+
+        <div class="graph_card">
+            <h2>Nombre de garçons</h2>
+            <span>{{ boysCount }}</span>
+        </div>
+
+        <div class="graph_card">
+            <h2>Pourcentage de garçon</h2>
+            <span>{{ boysPercent }}%</span>
+        </div>
+
+        <div class="graph_card">
+            <h2>Pourcentage de filles</h2>
+            <span>{{ girlsPercent }}%</span>
+        </div>
+
+        <div class="graph_card">
+            <h2>Nombre de chats</h2>
+            <span id="chats_span">{{ chatsCount }}</span>
+        </div>
+
+        <div class="graph_card">
+            <h2>Nombre total de messages</h2>
+            <span id="notif_span">{{ messagesCount }}</span>
+        </div>
+
+        <div class="graph_card">
+            <h2>Nombre moyen de messages par chat</h2>
+            <span>{{ messagesPerChat }}</span>
+        </div>
+
+        <div class="graph_card">
+            <h2>Nombre moyen de messages par utilisateur</h2>
+            <span>{{ messagesPerUser }}</span>
+        </div>
+
+        <div class="graph_card">
+            <h2>Nombre total des messages des parent</h2>
+            <span>{{ messagesPerParent }}</span>
+        </div>
+
+        <div class="graph_card">
+            <h2>Nombre total des messages des gardien</h2>
+            <span>{{ messagesPerGardian }}</span>
+        </div>
+
+        <div class="graph_card">
+            <h2>Nombre de commentaires</h2>
+            <span >{{ commentsCount }}</span>
+        </div>
+
+        <div class="graph_card">
+            <h2>Nombre moyen de commentaires sur des parents</h2>
+            <span>{{ commentsOnParentsCount }}</span>
+        </div>
+
+        <div class="graph_card">
+            <h2>Nombre moyen de commentaires sur des gardiens</h2>
+            <span>{{ commentsOnGardiansCount }}</span>
+        </div>
+
+        <div class="graph_card">
+            <h2>Nombre moyen de commentaires par utilisateur</h2>
+            <span>{{ userCommentsAvg }}</span>
+        </div>
+
+        <div class="graph_card">
+            <h2>Nombre de gardiens par enfant</h2>
+            <span>{{ gardiansPerChild }}</span>
+        </div>
+</section>
+
+<section class="graphs">
+    <div class="graph">
+        <canvas id="parentsChilds"  height="400"></canvas>
+    </div>
+    <div class="graph">
+        <canvas id="usersTypeAvarage"  height="400"></canvas>
+    </div>
+    <div class="graph">
+        <canvas id="genderChart"  height="400"></canvas>
+    </div>
+    <div class="graph">
+        <canvas id="suspendedProfils"  height="400"></canvas>
+    </div>
+    <div class="graph">
+        <canvas id="chatMessageChart"  height="400"></canvas>
+    </div>
+    <div class="graph">
+        <canvas id="averageMessagesChart"  height="400"></canvas>
+    </div>
+    <div class="graph">
+        <canvas id="usersactivityAvarage"  height="400"></canvas>
+    </div>
+     <div class="graph">
+        <canvas id="usersCities"  height="400"></canvas>
+    </div>
+</section>
+
+</main>
+
+<script src="{{ asset('assets/js/charts.js') }}"></script>
+
+<script>
+
+// chat message DOM
+function handleChatNotification(data, tag) {
+    const notifSpan = document.getElementById(tag);
+    notifSpan.innerText = parseInt(notifSpan.innerText) + 1;
+    notifSpan.style.borderColor = 'red';
+    notifSpan.style.color = 'red';
+
+    setTimeout(function () {
+        notifSpan.style.color = 'black';
+        notifSpan.style.borderColor = 'transparent';
+    }, 1000);
+}
+
+// New chat notification
+const chat_url = new URL('https://mercure.simschab.cloud/.well-known/mercure');
+// in prod change url to 'https://obaby.simschab.cloud/api/chats/{id}'
+const URI = window.location.origin;
+chat_url.searchParams.append('topic', URI + '/api/chats/{id}');
+
+const eventSource = new EventSource(chat_url);
+
+eventSource.onmessage = (event) => {
+    const data = JSON.parse(event.data);
+    console.log('Nouveau chat créé :', data);
+    handleChatNotification(data, 'chats_span');
+};
+
+// Chat message notification
+const url = new URL({{ mercureHubUrl|json_encode|raw }});
+url.searchParams.append('topic', 'chats_messages');
+const chat_eventSource = new EventSource(url);
+
+chat_eventSource.onmessage = function (event) {
+    const data = JSON.parse(event.data);
+    handleChatNotification(data, 'notif_span');
+};
+
+
+// mail DOM
+function handleEmailNotification(data) {
+    const emailSpan = document.getElementById('mail_span');
+    const mailCard = document.querySelector('.graph_card_full');
+    const h2 = document.querySelector('.graph_card_full h2');
+    const fromSpan = document.querySelector('.from');
+    const subjectSpan = document.querySelector('.subject');
+    const messageSpan = document.querySelector('.message');
+    const closeBtn = document.querySelector('.close_btn');
+
+    emailSpan.innerText = parseInt(emailSpan.innerText) + 1;
+    emailSpan.style.borderColor = 'red';
+    emailSpan.style.color = 'red';
+
+    setTimeout(function () {
+        emailSpan.style.color = 'black';
+        emailSpan.style.borderColor = 'transparent';
+    }, 1000);
+
+    // Ajout des données dans le DOM sur la graph_card_full
+    mailCard.classList.add('show');
+    h2.innerText = 'Nouveau message de : ' + data.senderFirstName + ' ' + data.senderLastName;
+    fromSpan.innerText = data.senderMail;
+    subjectSpan.innerText = data.subject;
+    messageSpan.innerText = data.messageContent;
+
+    closeBtn.addEventListener('click', function () {
+        // Retirer les données du DOM
+        h2.innerText = '';
+        fromSpan.innerText = '';
+        subjectSpan.innerText = '';
+        messageSpan.innerText = '';
+        mailCard.classList.remove('show');
+    });
+}
+
+// Mail notification
+const url2 = new URL({{ mercureHubUrl|json_encode|raw }});
+url2.searchParams.append('topic', 'contact_email');
+const contact_eventSource = new EventSource(url2);
+
+contact_eventSource.onmessage = function (event) {
+    const data = JSON.parse(event.data);
+    handleEmailNotification(data);
+};
+
+
+
+
+// display chart on parents and childs count
+var ctx = document.getElementById('parentsChilds').getContext('2d');
+var userTypeChart = new Chart(ctx, {
+    type: 'pie',
+    data: {
+        labels: ['Parents', 'enfants'],
+        datasets: [{
+            label: 'Total',
+            data: [{{ parentsCount }}, {{ childrenCount }}],
+            backgroundColor: [
+                'rgba(255, 99, 132, 0.6)',
+                'rgba(54, 162, 235, 0.6)',
+                'rgba(255, 206, 86, 0.6)',
+                'rgba(75, 192, 192, 0.6)'
+            ],
+        }]
+    },
+});
+
+// usersTypeAvarage display chart on parent and gardien count
+var ctx = document.getElementById('usersTypeAvarage').getContext('2d');
+var usersTypeAvarage = new Chart(ctx, {
+    type: 'pie',
+    data: {
+        labels: ['Parents', 'Gardiens'],
+        datasets: [{
+            label: 'Nombre',
+            data: [{{ parentsCount }}, {{ gardiensCount }}],
+            backgroundColor: [
+                'rgba(255, 99, 132, 0.6)',
+                'rgba(54, 162, 235, 0.6)',
+                'rgba(255, 206, 86, 0.6)',
+                'rgba(75, 192, 192, 0.6)'
+            ],
+        }]
+    },
+});
+
+// display chart on girls and boys count
+var ctx = document.getElementById('genderChart').getContext('2d');
+var genderChart = new Chart(ctx, {
+    type: 'pie',
+    data: {
+        labels: ['Garçons', 'Filles'],
+        datasets: [{
+            data: [{{ boysPercent }}, {{ girlsPercent }}],
+            backgroundColor: [
+                'rgba(255, 99, 132, 0.6)',
+                'rgba(54, 162, 235, 0.6)'
+            ],
+        }]
+    }
+});
+
+// chatMessageChart display chart on chat and chatMessage count
+var ctx = document.getElementById('chatMessageChart').getContext('2d');
+var chatMessageChart = new Chart(ctx, {
+    type: 'bar',
+    data: {
+        labels: ['Chats', 'Messages'],
+        datasets: [{
+            label: 'Nombre total',
+            data: [{{ chatsCount }}, {{ messagesCount }}],
+            backgroundColor: [
+                'rgba(255, 99, 132, 0.6)',
+                'rgba(54, 162, 235, 0.6)'
+            ],
+        }]
+    },
+});
+
+// averageMessagesChart display chart on parents and gardien messages count
+var ctx = document.getElementById('averageMessagesChart').getContext('2d');
+var averageMessagesChart = new Chart(ctx, {
+    type: 'bar',
+    data: {
+        labels: ['Message des Parent', 'Messages des Gardien'],
+        datasets: [{
+            label: 'Total par type d\'utilisateur',
+            data: [{{ messagesPerParent }}, {{ messagesPerGardian }}],
+        }]
+    },
+});
+
+// usersactivityAvarage averageMessagesChart and commentsCount
+var ctx = document.getElementById('usersactivityAvarage').getContext('2d');
+var usersactivityAvarage = new Chart(ctx, {
+    type: 'bar',
+    data: {
+        labels: ['messages', 'Commentaires'],
+        datasets: [{
+            label: 'Moyenne par utilisateur',
+            data: [{{ messagesPerUser }}, {{ userCommentsAvg }}],
+            backgroundColor: [
+                'rgba(255, 99, 132, 0.6)',
+                'rgba(54, 162, 235, 0.6)'
+            ],
+        }]
+    },
+});
+
+// users Cities chart
+const citiesData = {{usersCities|json_encode|raw}};
+const cities = Object.keys(citiesData);
+const userCounts = Object.values(citiesData).map(Number); 
+var ctx = document.getElementById('usersCities').getContext('2d');
+var usersCities = new Chart(ctx, {
+    type: 'bar',
+    data: {
+        labels: cities,
+        datasets: [{
+            label: 'Nombre d\'utilisateurs par ville',
+            data: userCounts,
+        }]
+    },
+});
+
+// suspended Profils chart = {{ suspendedUsersCount }}
+var ctx = document.getElementById('suspendedProfils').getContext('2d');
+var suspendedProfils = new Chart(ctx, {
+    type: 'pie',
+    data: {
+        labels: ['Profils actifs', 'Profils suspendus'],
+        datasets: [{
+            label: 'Nombre de profils',
+            data: [{{ usersCount }}, {{ suspendedUsersCount }}],
+            backgroundColor: [
+                'rgba(255, 99, 132, 0.6)',
+                'rgba(54, 162, 235, 0.6)'
+            ],
+        }]
+    },
+});
+
+</script>
+{% endblock %}

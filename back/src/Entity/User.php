@@ -14,6 +14,9 @@ use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Validator\Constraints as Assert;
 
+// two factor auth
+use Scheb\TwoFactorBundle\Model\Email\TwoFactorInterface;
+
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 
@@ -82,7 +85,7 @@ use Doctrine\ORM\Mapping as ORM;
  * @ORM\Entity(repositoryClass=UserRepository::class)
  * @UniqueEntity(fields={"email"}, message="Il y a déjà un compte avec cette adresse email")
  */
-class User implements UserInterface, PasswordAuthenticatedUserInterface
+class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFactorInterface
 {
     /**
      * @ORM\Id
@@ -340,6 +343,11 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      * //@Assert\Valid()
      */
     private $subjectComments;
+
+    /**
+     * @ORM\Column(type="string", nullable=true)
+     */
+    private $authCode;
 
     /**
      * @ORM\Column(type="datetime_immutable")
@@ -939,5 +947,29 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function getMercureTopic(): string
     {
         return 'user/' . $this->getId(); // Vous pouvez personnaliser le sujet selon vos besoins
+    }
+
+    public function isEmailAuthEnabled(): bool
+    {
+        return true; // This can be a persisted field to switch email code authentication on/off
+    }
+
+    public function getEmailAuthRecipient(): string
+    {
+        return $this->email;
+    }
+
+    public function getEmailAuthCode(): string
+    {
+        if (null === $this->authCode) {
+            throw new \LogicException('The email authentication code was not set');
+        }
+
+        return $this->authCode;
+    }
+
+    public function setEmailAuthCode(string $authCode): void
+    {
+        $this->authCode = $authCode;
     }
 }

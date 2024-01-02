@@ -1,0 +1,18 @@
+@startuml login API
+(*) --> "Utilisateur soumet\nles identifiants"
+--> "Backend (Security)\nRequête POST /api/login"
+--> "UserProvider\nRécupération de l'utilisateur"
+--> "Database\nRecherche de l'utilisateur"
+if "Identifiants invalides" then
+  -->[false] "Backend (Security)\nAuthentification de l'utilisateur"
+  --> "Backend (Security)\nGénération du token JWT"
+  --> "JWT Listener\nÉvénement onLoginSuccess de JWT"
+  --> "Listener\nRécupération et ajout\ninformations complémentaires"
+  --> "Backend (Security)\nRetourne le token JWT\net informations supplémentaires"
+  --> "Utilisateur connecté\navec le token JWT et\ninformations supplémentaires"
+else
+  -->[true] "Backend (Security)\nRetourne un message d'erreur"
+  --> "Utilisateur reçoit\nun message d'erreur"
+  --> "Utilisateur reste\nsur la page de login"
+endif
+@enduml

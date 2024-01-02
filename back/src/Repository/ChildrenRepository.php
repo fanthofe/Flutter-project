@@ -39,6 +39,42 @@ class ChildrenRepository extends ServiceEntityRepository
         }
     }
 
+    /**
+     * Count all children
+     * @return int
+     */
+    public function countAllChildren() : int
+    {
+        return $this->createQueryBuilder('c')
+            ->select('count(c.id)')
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
+
+    /**
+     * Count all female children 'f'
+     * @return int
+     */
+    public function countAllFemaleChildren() : int
+    {   
+        return $this->createQueryBuilder('c')
+        ->select('count(c.id)')
+        ->where('c.gender = :female')
+        ->setParameter('female', 'f')
+        ->getQuery()
+        ->getSingleScalarResult();
+    }
+
+    public function countAllMaleChildren() : int
+    {
+        return $this->createQueryBuilder('c')
+        ->select('count(c.id)')
+        ->where('c.gender = :male')
+        ->setParameter('male', 'm')
+        ->getQuery()
+        ->getSingleScalarResult();
+    }
+
 //    /**
 //     * @return Children[] Returns an array of Children objects
 //     */

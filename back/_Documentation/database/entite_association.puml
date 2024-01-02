@@ -1,0 +1,115 @@
+@startuml database
+entity "User" as User {
+  * id
+  * first_name
+  * last_name
+  * email
+  * password
+  * roles
+  * job
+  * experience_duration
+  * type
+  * subscriber
+  * is_professional
+  * status
+  * is_verified
+  * street
+  * city
+  * zip
+  * longitude
+  * latitude
+  * description
+  * profil_picture
+  * hour_price
+  * vehicle
+  * max_area
+  * birthday
+  * created_at
+  * updated_at
+}
+entity "Availability" as Availability {
+  * id
+  * name
+  * start_date
+  * end_date
+  * is_recurrent
+  * status
+  * created_at
+  * updated_at
+  --
+  * user_id <<FK>>
+}
+entity "Chat" as Chat {
+  * id
+  * status
+  * created_at
+  * updated_at
+  --
+  * user_1_id <<FK>>
+  * user_2_id <<FK>>
+}
+entity "ChatMessage" as ChatMessage {
+  * id
+  * content
+  * status
+  * created_at
+  * updated_at
+  --
+  * chat_id <<FK>>
+  * user_id <<FK>>
+}
+entity "Comment" as Comment {
+  * id
+  * content
+  * rate
+  * status
+  * created_at
+  * updated_at
+  --
+  * author_id <<FK>>
+  * subject_id <<FK>>
+}
+entity "Subscription" as Subscription {
+  * id
+  * duration_month
+  * price
+  * description
+  * status
+  * created_at
+  * updated_at
+  --
+}
+entity "Order" as Order {
+  * id
+  * user_id
+  * subscription_id
+  * payment_type
+  * status
+  * is_recurrent
+  * created_at
+  * updated_at
+  --
+  * user_id <<FK>>
+  * subscription_id <<FK>>
+}
+entity "Children" as Children {
+  * id
+  * user_id
+  * birthday
+  * gender
+  * name
+  * description
+  * status
+  * created_at
+  * updated_at
+  --
+  * user_id <<FK>>
+}
+User }o--|| Availability
+User }o--o{ Chat
+Chat }o--|| ChatMessage
+User }o--|| Comment
+User }o--|| Children
+Order ||-o{ Subscription
+User }o--|| Order
+@enduml

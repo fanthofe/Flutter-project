@@ -1,0 +1,38 @@
+{% extends 'base.html.twig' %}
+{% block title %}Two Factor Auth{% endblock %}
+{% block body %}
+<div class="form-container">
+    <h1>Two Factor Authentication</h1>
+    {% if authenticationError %}
+    <p>{{ authenticationError|trans(authenticationErrorData, 'SchebTwoFactorBundle') }}</p>
+    {% endif %}
+    
+    <form class="form" action="{{ checkPathUrl ? checkPathUrl: path(checkPathRoute) }}" method="post">
+        <label for="_auth_code">Saisir le code à 6 chiffre :</label>
+            <input
+                id="_auth_code"
+                type="text"
+                name="{{ authCodeParameterName }}"
+                autocomplete="one-time-code"
+                autofocus
+                inputmode="numeric"
+                pattern="[0-9]*"
+            />
+        {% if displayTrustedOption %}
+        <div class="form_check">
+            <input id="_trusted" type="checkbox" name="{{ trustedParameterName }}" /> {{ "trusted"|trans({}, 'SchebTwoFactorBundle') }}</label>
+            <label for="_trusted">
+        </div>
+        {% endif %}
+        {% if isCsrfProtectionEnabled %}
+            <input type="hidden" name="{{ csrfParameterName }}" value="{{ csrf_token(csrfTokenId) }}">
+        {% endif %}
+        {# <p class="submit"><input type="submit" value="{{ "login"|trans({}, 'SchebTwoFactorBundle') }}" /></p> #}
+        <button class="form_button" type="submit" id="login">
+            LogIn
+        </button>
+    </form>
+    {# The logout link gives the user a way out if they can't complete two-factor authentication #}
+    <button class="form_button"><a href="{{ path('app_logout') }}">Déconnexion</a></button>
+</div>
+{% endblock %}

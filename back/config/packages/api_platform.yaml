@@ -18,9 +18,9 @@ api_platform:
             apiKey:
                 name: Authorization
                 type: header
-    # collection: 
-    #     pagination:
-    #         enabled: true
-    #         client_items_per_page: true
-    #         items_per_page: 10
+    # enable mercure hub for real time update
+    mercure:
+        enabled: true
+        hub_url: '%env(MERCURE_URL)%'
+
     

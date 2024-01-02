@@ -51,7 +51,7 @@ class ChatRepository extends ServiceEntityRepository
             ->select('u.id as user_id')
             ->addSelect('c.id as chat_id, c.updatedAt as chat_updatedAt')
             ->addSelect('cu.id as participant_id, cu.firstName as participant_firstName, cu.lastName as participant_lastName, cu.profilPicture as participant_profilPicture')
-            ->addSelect('cm.id as message_id, cm.content as message_content, cm.status as message_status, cm.createdAt')
+            ->addSelect('cm.id as message_id, cm.content as message_content, cm.createdAt')
             ->distinct()
             ->leftJoin('c.user', 'cu')
             ->leftJoin('c.chatMessages', 'cm')
@@ -96,6 +96,17 @@ class ChatRepository extends ServiceEntityRepository
             ->getOneOrNullResult();
 
         return $qb;
+    }
+
+    /**
+     * Count chats
+     */
+    public function countAllChats(): int
+    {
+        return $this->createQueryBuilder('c')
+            ->select('count(c.id)')
+            ->getQuery()
+            ->getSingleScalarResult();
     }
 
 //    /**

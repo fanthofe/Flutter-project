@@ -3,11 +3,13 @@
 namespace App\Controller\Admin;
 
 use App\Entity\User;
+use App\Service\GetUsersCityService;
 use Symfony\Component\Security\Core\Security;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Filters;
 use EasyCorp\Bundle\EasyAdminBundle\Field\DateField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\ImageField;
@@ -15,6 +17,8 @@ use EasyCorp\Bundle\EasyAdminBundle\Field\ChoiceField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\NumberField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\BooleanField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\DateTimeField;
+use EasyCorp\Bundle\EasyAdminBundle\Filter\ChoiceFilter;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 
@@ -27,11 +31,17 @@ class UserCrudController extends AbstractCrudController
     private $security;
 
     /**
+     * @var GetUsersCityService
+     */
+    private $getUsersCityService;
+
+    /**
      * @param Security $security
      */
-    public function __construct(Security $security)
+    public function __construct(Security $security, GetUsersCityService $getUsersCityService)
     {
         $this->security = $security;
+        $this->getUsersCityService = $getUsersCityService;
     }
 
     public static function getEntityFqcn(): string
@@ -67,7 +77,13 @@ class UserCrudController extends AbstractCrudController
     public function configureFields(string $pageName): iterable
     {
         return [
-            IdField::new('id')->hideOnForm(),
+            IdField::new('id')
+                ->setTemplatePath('admin/fields/id_link.html.twig')
+                ->hideOnDetail()
+                ->hideOnForm(),
+            IdField::new('id', 'Identifiant')
+                ->hideOnForm()
+                ->hideOnIndex(),
             TextField::new('lastName', 'Nom de famille'),
             TextField::new('firstName', 'Prénom'),
             TextField::new('email', 'Email'),
@@ -85,7 +101,6 @@ class UserCrudController extends AbstractCrudController
             BooleanField::new('subscriber', 'Abonné'),
             BooleanField::new('isProfessional', 'Professionnel')
                 ->hideOnIndex(),
-            // BooleanField::new('status', 'Statut'),
             ChoiceField::new('status', 'Statut')
                 ->setChoices([
                     'Profil actif' => 1,
@@ -175,14 +190,14 @@ class UserCrudController extends AbstractCrudController
     // lien vers le detail d'une fiche
     public function configureActions(Actions $actions): Actions
     {   
-        $isSuperAdmin = $this->security->isGranted('ROLE_ADMIN');
+        $isSuperAdmin = $this->security->isGranted('ROLE_SUPER_ADMIN');
         $isAdmin = $this->security->isGranted('ROLE_ADMIN');
 
         if($isSuperAdmin || $isAdmin) {
             $actions
                 ->setPermission(Action::NEW, 'ROLE_ADMIN')
-                ->setPermission(Action::EDIT, 'ROLE_ADMIN')
-                ->setPermission(Action::DELETE, 'ROLE_ADMIN')
+                ->setPermission(Action::EDIT, 'ROLE_SUPER_ADMIN')
+                ->setPermission(Action::DELETE, 'ROLE_SUPER_ADMIN')
                 ->setPermission(Action::DETAIL, 'ROLE_ADMIN');
         } else {
             $actions
@@ -197,4 +212,45 @@ class UserCrudController extends AbstractCrudController
         return $actions
             ->add(Crud::PAGE_INDEX, $detailView);
     }
+
+    public function configureFilters(Filters $filters): Filters
+    {
+        return $filters
+            ->add('email', 'Email')
+            ->add('parent', 'Type de profil')
+            ->add('subscriber', 'Abonné')
+            ->add(ChoiceFilter::new('status', 'Statut')
+               ->setChoices([
+                   'Actif' => 0,
+                   'Archivé' => 1,
+               ])
+           )
+            ->add(ChoiceFilter::new('city', 'Ville')
+               ->setChoices($this->GetUsersCities())
+            )        
+            ->add(ChoiceFilter::new('zip', 'Code postal')
+               ->setChoices($this->GetUsersCitiesZip())
+            )
+        ;
+
+    }
+
+    /**
+     * Get all cities from users
+     * @return array
+     */
+    private function GetUsersCities()
+    {   
+        return $this->getUsersCityService->getAllCities();
+    }
+
+    /**
+     * Get all cities zip from users
+     * @return array
+     */
+    private function GetUsersCitiesZip()
+    {
+        return $this->getUsersCityService->getAllCitiesZip();
+    }
+
 }

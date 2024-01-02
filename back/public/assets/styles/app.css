@@ -94,18 +94,13 @@ small {
     font-size: 10px;
     color: #bfbfbf;
 }
-
-
 .message-container {
    font-size: 14px;
    text-align: left;
 }
-
-/* Media queries pour les écrans de petite taille (mobiles) */
-@media screen and (max-width: 768px) {
-    .form-container, 
-    .message-container {
-        max-width: 90%; 
-        padding: 10px; 
-    }
+.user_info {
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    text-align: center;
 }

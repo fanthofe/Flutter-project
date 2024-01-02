@@ -61,7 +61,12 @@ class SubscriptionCrudController extends AbstractCrudController
     {
         return [
             IdField::new('id')
+                ->setTemplatePath('admin/fields/id_link.html.twig')
+                ->hideOnDetail()
                 ->hideOnForm(),
+            IdField::new('id', 'Identifiant')
+                ->hideOnForm()
+                ->hideOnIndex(),
             TextField::new('name', 'Nom'),
             IntegerField::new('durationMonth', 'Durée en mois'),
             TextField::new('price', 'Prix'),
@@ -70,7 +75,8 @@ class SubscriptionCrudController extends AbstractCrudController
             AssociationField::new('orders', 'Nombre de factures')
                 ->setFormTypeOption('by_reference', false)
                 ->setFormTypeOption('multiple', true)
-                ->setFormTypeOption('required', false),
+                ->setFormTypeOption('required', false)
+                ->hideOnForm(),
             DateTimeField::new('createdAt', 'Créé le')
                 ->setFormat('dd/MM/YY HH:mm')
                 ->setTimezone('Europe/Paris')
@@ -79,20 +85,19 @@ class SubscriptionCrudController extends AbstractCrudController
                 ->setFormat('dd/MM/YY HH:mm')
                 ->setTimezone('Europe/Paris')
                 ->hideOnForm(),
-       
         ];
     }
     // lien vers le detail d'une fiche
     public function configureActions(Actions $actions): Actions
     {   
-        $isSuperAdmin = $this->security->isGranted('ROLE_ADMIN');
+        $isSuperAdmin = $this->security->isGranted('ROLE_SUPER_ADMIN');
         $isAdmin = $this->security->isGranted('ROLE_ADMIN');
 
         if($isSuperAdmin || $isAdmin) {
             $actions
                 ->setPermission(Action::NEW, 'ROLE_ADMIN')
-                ->setPermission(Action::EDIT, 'ROLE_ADMIN')
-                ->setPermission(Action::DELETE, 'ROLE_ADMIN')
+                ->setPermission(Action::EDIT, 'ROLE_SUPER_ADMIN')
+                ->setPermission(Action::DELETE, 'ROLE_SUPER_ADMIN')
                 ->setPermission(Action::DETAIL, 'ROLE_ADMIN');
         } else {
             $actions

@@ -23,9 +23,14 @@ use Doctrine\ORM\Mapping as ORM;
  *          "get" = {
  *              "security"="is_granted('ROLE_USER')"
  *          },
- *          "post" = {
- *              "security"="is_granted('ROLE_USER')"
- *          }
+ *         "post" = {
+ *             "security"="is_granted('ROLE_USER')"
+ *         },
+ *          "api_post_async_messages"={
+ *             "method"="POST",
+ *            "path"="/api/async_chat_messages",
+ *            "controller"=ApiChatController::class
+ *         }
  *      },
  * 
  *     itemOperations={
